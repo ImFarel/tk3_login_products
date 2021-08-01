@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -14,8 +16,13 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $response = Http::get('');
-        return view('product.index');
+        // $response = Http::get('https://fakestoreapi.com/products?limit=5')->json();
+        $response = Cache::remember('products', now()->addHours(2), function () {
+            return Http::get('https://fakestoreapi.com/products?limit=5')->json();
+        });
+        // dd($response);
+        debugbar()->info($response);
+        return view('products.index')->with('data', $response);
     }
 
     /**
@@ -25,7 +32,7 @@ class ProductController extends Controller
      */
     public function create()
     {
-        //
+        return view('products.create');
     }
 
     /**
@@ -36,7 +43,22 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validate = $request->validate([
+            'title' => 'required',
+            'description' => 'required',
+            'buy' => 'required|numeric',
+            'sell' => 'required|numeric',
+            'image' => 'file|max:1000',
+        ]);
+        // dd($request->file('image')->getClientOriginalName(), $request->file('image')->getContent());
+        $cache = Cache::get('products');
+        Storage::disk('local')->put('public/' . $request->file('image')->getClientOriginalName(), $request->file('image')->getContent());
+        $merged = $request->merge(['id' => (count($cache) + 1), 'imageName' => $request->file('image')->getClientOriginalName()]);
+
+        array_push($cache, $merged->except(['_token', 'image']));
+        Cache::put('products', $cache, now()->addHours(2));
+
+        return redirect('products')->with('status', 'Created!');
     }
 
     /**

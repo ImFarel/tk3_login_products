@@ -261,11 +261,11 @@ return [
             'submenu' => [
                 [
                     'text' => 'Product List',
-                    'url'  => '#',
+                    'url'  => '/products',
                 ],
                 [
                     'text' => 'Add Product',
-                    'url'  => '#',
+                    'url'  => '/products/create',
                 ],
             ],
         ],

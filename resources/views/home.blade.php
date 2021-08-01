@@ -5,7 +5,6 @@
 @section('content_header')
 <h1>
     {{ __('Dashboard') }}
-
 </h1>
 @stop
 
