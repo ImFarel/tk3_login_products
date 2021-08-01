@@ -20,9 +20,15 @@
         <h3 class="card-title">Products</h3>
 
         <div class="card-tools">
-            <a href={{route('products.create')}} class="btn btn-tool">
-                <i class="fas fa-plus"></i>
-            </a>
+            <form action="{{route('products.sync')}}" method="post">
+                @csrf
+                <button type="submit" class="btn btn-tool">
+                    <i class="fas fa-sync"></i>
+                </button>
+                <a href={{route('products.create')}} class="btn btn-tool">
+                    <i class="fas fa-plus"></i>
+                </a>
+            </form>
         </div>
     </div>
     <div class="card-body p-0">
@@ -50,7 +56,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($data as $item)
+                @foreach ($data as $key => $item)
                 <tr>
                     <td>
                         {!! $item['title'] !!}
@@ -76,7 +82,8 @@
                         <ul class="list-inline">
                             <li class="list-inline-item">
                                 @if (array_key_exists('imageName', $item))
-                                <img alt="Product image" class="table-avatar" src={{ asset('storage/'.$item['imageName']) }} />
+                                <img alt="Product image" class="table-avatar"
+                                    src={{ asset('storage/'.$item['imageName']) }} />
                                 @else
                                 <img alt="Product image" class="table-avatar"
                                     src="https://dummyimage.com/600x400/000/fff" />
@@ -86,12 +93,6 @@
                     </td>
                     <td class="project-actions text-right">
                         <form action={{route('products.destroy', ['product' => $item['id']])}} method="post">
-                            <a class="btn btn-primary btn-sm"
-                                href={{ route('products.show', ['product' => $item['id']]) }}>
-                                <i class="fas fa-folder">
-                                </i>
-                                View
-                            </a>
                             <a class="btn btn-info btn-sm"
                                 href={{ route('products.edit', ['product' => $item['id']]) }}>
                                 <i class="fas fa-pencil-alt">
